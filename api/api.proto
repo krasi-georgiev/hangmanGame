@@ -1,0 +1,33 @@
+syntax = "proto3";
+
+service Hangman {
+	rpc New(HangmanRequest) returns (HangmanReply){};
+	rpc List(HangmanRequest) returns (HangmanReply){};
+	rpc Resume(HangmanRequest) returns (HangmanReply){};
+	rpc Guess(GuessRequest) returns (GuessReply){};
+}
+
+message HangmanRequest {
+	int32 id = 1;
+}
+
+message HangmanReply {
+		repeated Game game=1;
+}
+
+message Game{
+		int32 id = 1;
+		bool status = 2;
+}
+
+message GuessRequest {
+	int32 hangmanID = 1;
+	string letter = 2;
+}
+
+message GuessReply {
+	int32 	lifeTotal=1; ;
+	int32 	lifeLeft=2; ; // -1 means dead
+	string 	word=3;
+	string 	letterPosition=4	; // -1 means the letter doesn't exist in the word
+}
