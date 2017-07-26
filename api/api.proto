@@ -1,33 +1,34 @@
 syntax = "proto3";
 
 service Hangman {
-	rpc NewGallow(HangmanRequest) returns (HangmanReply){};
-	rpc ListGallows(HangmanRequest) returns (HangmanReply){};
-	rpc ResumeGallow(HangmanRequest) returns (HangmanReply){};
+	rpc NewGallow(GallowRequest) returns (GallowReply){};
+	rpc ListGallows(GallowRequest) returns (GallowReply){};
+	rpc ResumeGallow(GallowRequest) returns (GallowReply){};
 	rpc GuessLetter(GuessRequest) returns (GuessReply){};
 }
 
-message HangmanRequest {
-	int32 id = 1;
+message GallowRequest {
+	int32 Id = 1;
+	int32 RetryLimit=2;
 }
 
-message HangmanReply {
-		repeated Gallow gallow=1;
+message GallowReply {
+	repeated Gallow gallow=1;
 }
 
 message Gallow{
-		int32 id = 1;
-		bool status = 2;
+	int32 Id = 1;
+	int32 RetryLimit=2;
+	int32 RetryLeft=3;
 }
 
 message GuessRequest {
-	int32 hangmanID = 1;
-	string letter = 2;
+	int32 	GallowID = 1;
+	string 	Letter = 2;
 }
 
 message GuessReply {
-	int32 	lifeTotal=1; ;
-	int32 	lifeLeft=2; ; // -1 means dead
-	string 	word=3;
-	string 	letterPosition=4	; // -1 means the letter doesn't exist in the word
+	Gallow 	Gallow=1;
+	string 	Word=3;
+	string 	LetterPosition=4	; // -1 means the letter doesn't exist in the word
 }

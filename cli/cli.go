@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"strings"
 
@@ -42,13 +43,18 @@ func main() {
 		switch {
 
 		case line == "1" || line == "1 - new game":
+			r, err := newGallow()
+			if err != nil {
+				log.Fatal(err)
+			}
+			fmt.Println(r)
 			fmt.Println("Game on!")
-			newGallow()
 			l.SetPrompt("Enter letter: ")
 			for {
 				letter, err := l.Readline()
 				if err != readline.ErrInterrupt {
 					if len(letter) != 0 {
+						guessLetter()
 					}
 					continue
 				} else {
@@ -58,7 +64,7 @@ func main() {
 				}
 			}
 
-		case line == "2" || line == "2 - list saved games":
+		case line == "2" || line == "2 - saved games":
 			listGallows()
 		case line == "3" || line == "3 - exit":
 			os.Exit(1)
@@ -74,6 +80,6 @@ func usage(w io.Writer) {
 
 var completer = readline.NewPrefixCompleter(
 	readline.PcItem("1 - new game"),
-	readline.PcItem("2 - list saved games"),
+	readline.PcItem("2 - saved games"),
 	readline.PcItem("3 - exit"),
 )

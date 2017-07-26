@@ -33,7 +33,6 @@ func getGRPCConnection(context *context.Context) (api.HangmanClient, error) {
 	return grpcClient, nil
 }
 
-// appContext returns the context for a command.
 func appContext() (context.Context, context.CancelFunc) {
 	var (
 		ctx     = context.Background()

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -12,22 +13,21 @@ import (
 )
 
 type hangman struct {
-	slaughterhouse []api.Gallow
+	slaughter []*api.Gallow
 }
 
-func (s *hangman) NewGallow(context.Context, *api.HangmanRequest) (*api.HangmanReply, error) {
-	s.slaughterhouse = append(s.slaughterhouse, api.Gallow{Id: int32(len(s.slaughterhouse) + 1), Status: true})
-	for k, v := range s.slaughterhouse {
-		log.Println(k)
-		log.Println(v)
+func (s *hangman) NewGallow(ctx context.Context, r *api.GallowRequest) (*api.GallowReply, error) {
+	if r.RetryLimit < 1 {
+		return nil, errors.New("Please specify retry limit for this hangman")
 	}
-	return nil, nil
+	s.slaughter = append(s.slaughter, &api.Gallow{Id: int32(len(s.slaughter) + 1)})
+	return &api.GallowReply{Gallow: s.slaughter}, nil
 }
-func (s *hangman) ListGallows(context.Context, *api.HangmanRequest) (*api.HangmanReply, error) {
+func (s *hangman) ListGallows(context.Context, *api.GallowRequest) (*api.GallowReply, error) {
 	fmt.Println("LIST")
 	return nil, nil
 }
-func (s *hangman) ResumeGallow(context.Context, *api.HangmanRequest) (*api.HangmanReply, error) {
+func (s *hangman) ResumeGallow(context.Context, *api.GallowRequest) (*api.GallowReply, error) {
 	return nil, nil
 }
 func (s *hangman) GuessLetter(context.Context, *api.GuessRequest) (*api.GuessReply, error) {

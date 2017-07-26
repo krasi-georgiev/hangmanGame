@@ -1,20 +1,26 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/krasi-georgiev/hangmanGame/api"
 )
 
-func newGallow() (*api.Gallow, error) {
+func guessLetter() error {
 	ctx, cancel := appContext()
 	defer cancel()
 
 	client, err := getGRPCConnection(&ctx)
 	if err != nil {
-		return nil, err
+		return err
 	}
-	r, err := client.NewGallow(ctx, &api.GallowRequest{RetryLimit: 5})
+	guess, err := client.GuessLetter(ctx, &api.GuessRequest{})
 	if err != nil {
-		return nil, err
+		return err
 	}
-	return r.Gallow[0], nil
+
+	fmt.Println("sdfsdf")
+	fmt.Println(guess)
+
+	return nil
 }

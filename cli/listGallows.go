@@ -16,7 +16,7 @@ func listGallows() error {
 	if err != nil {
 		return err
 	}
-	games, err := client.ListGallows(ctx, &api.HangmanRequest{})
+	games, err := client.ListGallows(ctx, &api.GallowRequest{})
 	if err != nil {
 		return err
 	}
