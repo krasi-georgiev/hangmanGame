@@ -13,13 +13,17 @@ message GallowRequest {
 }
 
 message GallowReply {
-	repeated Gallow gallow=1;
+	repeated Gallow Gallow=1;
 }
 
 message Gallow{
-	int32 Id = 1;
-	int32 RetryLimit=2;
-	int32 RetryLeft=3;
+	int32 		Id = 1;
+	int32 		RetryLimit=2;
+	int32 		RetryLeft=3;
+	string 		Word=4;
+	string 		WordMasked=5;
+	repeated 	GuessRequest Guesses=6;
+
 }
 
 message GuessRequest {
@@ -29,6 +33,5 @@ message GuessRequest {
 
 message GuessReply {
 	Gallow 	Gallow=1;
-	string 	Word=3;
-	string 	LetterPosition=4	; // -1 means the letter doesn't exist in the word
+	int32 	LetterPosition=4	; // -1 means the letter doesn't exist in the word
 }
