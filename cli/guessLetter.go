@@ -6,14 +6,9 @@ import (
 	"github.com/krasi-georgiev/hangmanGame/api"
 )
 
-func guessLetter() error {
+func guessLetter(client api.HangmanClient) error {
 	ctx, cancel := appContext()
 	defer cancel()
-
-	client, err := getGRPCConnection(&ctx)
-	if err != nil {
-		return err
-	}
 	guess, err := client.GuessLetter(ctx, &api.GuessRequest{})
 	if err != nil {
 		return err

@@ -22,7 +22,10 @@ func main() {
 	}
 	defer l.Close()
 
-	// log.SetOutput(l.Stderr())
+	clt, err := getGRPCConnection()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	usage(l.Stdout())
 
@@ -43,9 +46,10 @@ func main() {
 		switch {
 
 		case line == "1" || line == "1 - new game":
-			r, err := newGallow()
+			r, err := newGallow(clt)
 			if err != nil {
-				log.Fatal(err)
+				log.Println(err)
+				break
 			}
 			fmt.Println(r)
 			fmt.Println("Game on!")
@@ -54,7 +58,7 @@ func main() {
 				letter, err := l.Readline()
 				if err != readline.ErrInterrupt {
 					if len(letter) != 0 {
-						guessLetter()
+						guessLetter(clt)
 					}
 					continue
 				} else {
@@ -65,7 +69,7 @@ func main() {
 			}
 
 		case line == "2" || line == "2 - saved games":
-			listGallows()
+			listGallows(clt)
 		case line == "3" || line == "3 - exit":
 			os.Exit(1)
 		default:

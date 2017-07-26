@@ -6,16 +6,9 @@ import (
 	"github.com/krasi-georgiev/hangmanGame/api"
 )
 
-func listGallows() error {
-	var (
-		ctx, cancel = appContext()
-	)
+func listGallows(client api.HangmanClient) error {
+	ctx, cancel := appContext()
 	defer cancel()
-
-	client, err := getGRPCConnection(&ctx)
-	if err != nil {
-		return err
-	}
 	games, err := client.ListGallows(ctx, &api.GallowRequest{})
 	if err != nil {
 		return err
