@@ -1,0 +1,23 @@
+{
+    "services": [
+        {
+            "name": "cli",
+            "path": "cli",
+            "commands": {
+                "build": "go install",
+                "launch": "cli"
+            },
+						"watch": "cli"
+        },
+        {
+            "name": "server",
+            "path": "server",
+            "commands": {
+                "build": "go install",
+                "launch": "server"
+            },
+						"watch": "server"
+
+        }
+    ]
+}

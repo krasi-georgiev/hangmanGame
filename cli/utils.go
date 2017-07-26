@@ -7,19 +7,18 @@ import (
 	"time"
 
 	"github.com/krasi-georgiev/hangmanGame/api"
-	"github.com/urfave/cli"
 	"google.golang.org/grpc"
 )
 
 var grpcClient api.HangmanClient
 
-func getGRPCConnection(context *cli.Context) (api.HangmanClient, error) {
+func getGRPCConnection(context *context.Context) (api.HangmanClient, error) {
 	if grpcClient != nil {
 		return grpcClient, nil
 	}
 
-	bindSocket := context.GlobalString("address")
-	dialOpts := []grpc.DialOption{grpc.WithInsecure(), grpc.WithTimeout(context.GlobalDuration("connect-timeout"))}
+	bindSocket := ":9999"
+	dialOpts := []grpc.DialOption{grpc.WithInsecure()}
 	dialOpts = append(dialOpts,
 		grpc.WithDialer(func(addr string, timeout time.Duration) (net.Conn, error) {
 			return net.DialTimeout("tcp", bindSocket, timeout)
@@ -35,10 +34,10 @@ func getGRPCConnection(context *cli.Context) (api.HangmanClient, error) {
 }
 
 // appContext returns the context for a command.
-func appContext(clicontext *cli.Context) (context.Context, context.CancelFunc) {
+func appContext() (context.Context, context.CancelFunc) {
 	var (
 		ctx     = context.Background()
-		timeout = clicontext.GlobalDuration("timeout")
+		timeout = 2 * time.Second
 		cancel  = func() {}
 	)
 

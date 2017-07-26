@@ -1,10 +1,10 @@
 syntax = "proto3";
 
 service Hangman {
-	rpc New(HangmanRequest) returns (HangmanReply){};
-	rpc List(HangmanRequest) returns (HangmanReply){};
-	rpc Resume(HangmanRequest) returns (HangmanReply){};
-	rpc Guess(GuessRequest) returns (GuessReply){};
+	rpc NewGallow(HangmanRequest) returns (HangmanReply){};
+	rpc ListGallows(HangmanRequest) returns (HangmanReply){};
+	rpc ResumeGallow(HangmanRequest) returns (HangmanReply){};
+	rpc GuessLetter(GuessRequest) returns (GuessReply){};
 }
 
 message HangmanRequest {
@@ -12,10 +12,10 @@ message HangmanRequest {
 }
 
 message HangmanReply {
-		repeated Game game=1;
+		repeated Gallow gallow=1;
 }
 
-message Game{
+message Gallow{
 		int32 id = 1;
 		bool status = 2;
 }

@@ -2,42 +2,78 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
-	"time"
+	"strings"
 
-	"github.com/urfave/cli"
+	"github.com/chzyer/readline"
 )
 
 func main() {
-	app := cli.NewApp()
-	app.Name = "hangman cli"
-	app.Version = "0.1"
-	app.Usage = `hangman usage`
-
-	app.Flags = []cli.Flag{
-		cli.StringFlag{
-			Name:  "address, a",
-			Usage: "address for the hangman server",
-			Value: "localhost:9999",
-		},
-		cli.DurationFlag{
-			Name:  "timeout",
-			Usage: "total timeout for any commands",
-			Value: time.Duration(2 * time.Second),
-		},
-		cli.DurationFlag{
-			Name:  "connect-timeout",
-			Usage: "timeout for connecting to the hangman server",
-			Value: time.Duration(2 * time.Second),
-		},
-	}
-
-	app.Commands = append([]cli.Command{
-		hangmanListCommand,
+	l, err := readline.NewEx(&readline.Config{
+		Prompt:          "»",
+		InterruptPrompt: "^C",
+		AutoComplete:    completer,
+		EOFPrompt:       "exit",
 	})
+	if err != nil {
+		panic(err)
+	}
+	defer l.Close()
 
-	if err := app.Run(os.Args); err != nil {
-		fmt.Fprintf(os.Stderr, "ctr: %s\n", err)
-		os.Exit(1)
+	// log.SetOutput(l.Stderr())
+
+	usage(l.Stdout())
+
+	for {
+		line, err := l.Readline()
+		if err == readline.ErrInterrupt {
+			if len(line) == 0 {
+				break
+			} else {
+				continue
+			}
+		} else if err == io.EOF {
+			break
+		}
+
+		line = strings.TrimSpace(line)
+
+		switch {
+
+		case line == "1" || line == "1 - new game":
+			fmt.Println("Game on!")
+			newGallow()
+			l.SetPrompt("Enter letter: ")
+			for {
+				letter, err := l.Readline()
+				if err != readline.ErrInterrupt {
+					if len(letter) != 0 {
+					}
+					continue
+				} else {
+					l.SetPrompt("»")
+					usage(l.Stdout())
+					break
+				}
+			}
+
+		case line == "2" || line == "2 - list saved games":
+			listGallows()
+		case line == "3" || line == "3 - exit":
+			os.Exit(1)
+		default:
+			usage(l.Stdout())
+		}
 	}
 }
+
+func usage(w io.Writer) {
+	io.WriteString(w, completer.Tree("    "))
+}
+
+var completer = readline.NewPrefixCompleter(
+	readline.PcItem("1 - new game"),
+	readline.PcItem("2 - list saved games"),
+	readline.PcItem("3 - exit"),
+)

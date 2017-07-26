@@ -11,7 +11,7 @@ It is generated from these files:
 It has these top-level messages:
 	HangmanRequest
 	HangmanReply
-	Game
+	Gallow
 	GuessRequest
 	GuessReply
 */
@@ -54,7 +54,7 @@ func (m *HangmanRequest) GetId() int32 {
 }
 
 type HangmanReply struct {
-	Game []*Game `protobuf:"bytes,1,rep,name=game" json:"game,omitempty"`
+	Gallow []*Gallow `protobuf:"bytes,1,rep,name=gallow" json:"gallow,omitempty"`
 }
 
 func (m *HangmanReply) Reset()                    { *m = HangmanReply{} }
@@ -62,31 +62,31 @@ func (m *HangmanReply) String() string            { return proto.CompactTextStri
 func (*HangmanReply) ProtoMessage()               {}
 func (*HangmanReply) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
-func (m *HangmanReply) GetGame() []*Game {
+func (m *HangmanReply) GetGallow() []*Gallow {
 	if m != nil {
-		return m.Game
+		return m.Gallow
 	}
 	return nil
 }
 
-type Game struct {
+type Gallow struct {
 	Id     int32 `protobuf:"varint,1,opt,name=id" json:"id,omitempty"`
 	Status bool  `protobuf:"varint,2,opt,name=status" json:"status,omitempty"`
 }
 
-func (m *Game) Reset()                    { *m = Game{} }
-func (m *Game) String() string            { return proto.CompactTextString(m) }
-func (*Game) ProtoMessage()               {}
-func (*Game) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
+func (m *Gallow) Reset()                    { *m = Gallow{} }
+func (m *Gallow) String() string            { return proto.CompactTextString(m) }
+func (*Gallow) ProtoMessage()               {}
+func (*Gallow) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
 
-func (m *Game) GetId() int32 {
+func (m *Gallow) GetId() int32 {
 	if m != nil {
 		return m.Id
 	}
 	return 0
 }
 
-func (m *Game) GetStatus() bool {
+func (m *Gallow) GetStatus() bool {
 	if m != nil {
 		return m.Status
 	}
@@ -118,15 +118,23 @@ func (m *GuessRequest) GetLetter() string {
 }
 
 type GuessReply struct {
-	LifeLeft       int32  `protobuf:"varint,1,opt,name=lifeLeft" json:"lifeLeft,omitempty"`
-	Word           string `protobuf:"bytes,2,opt,name=word" json:"word,omitempty"`
-	LetterPosition string `protobuf:"bytes,3,opt,name=letterPosition" json:"letterPosition,omitempty"`
+	LifeTotal      int32  `protobuf:"varint,1,opt,name=lifeTotal" json:"lifeTotal,omitempty"`
+	LifeLeft       int32  `protobuf:"varint,2,opt,name=lifeLeft" json:"lifeLeft,omitempty"`
+	Word           string `protobuf:"bytes,3,opt,name=word" json:"word,omitempty"`
+	LetterPosition string `protobuf:"bytes,4,opt,name=letterPosition" json:"letterPosition,omitempty"`
 }
 
 func (m *GuessReply) Reset()                    { *m = GuessReply{} }
 func (m *GuessReply) String() string            { return proto.CompactTextString(m) }
 func (*GuessReply) ProtoMessage()               {}
 func (*GuessReply) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
+
+func (m *GuessReply) GetLifeTotal() int32 {
+	if m != nil {
+		return m.LifeTotal
+	}
+	return 0
+}
 
 func (m *GuessReply) GetLifeLeft() int32 {
 	if m != nil {
@@ -152,7 +160,7 @@ func (m *GuessReply) GetLetterPosition() string {
 func init() {
 	proto.RegisterType((*HangmanRequest)(nil), "HangmanRequest")
 	proto.RegisterType((*HangmanReply)(nil), "HangmanReply")
-	proto.RegisterType((*Game)(nil), "Game")
+	proto.RegisterType((*Gallow)(nil), "Gallow")
 	proto.RegisterType((*GuessRequest)(nil), "GuessRequest")
 	proto.RegisterType((*GuessReply)(nil), "GuessReply")
 }
@@ -168,10 +176,10 @@ const _ = grpc.SupportPackageIsVersion4
 // Client API for Hangman service
 
 type HangmanClient interface {
-	New(ctx context.Context, in *HangmanRequest, opts ...grpc.CallOption) (*HangmanReply, error)
-	List(ctx context.Context, in *HangmanRequest, opts ...grpc.CallOption) (*HangmanReply, error)
-	Resume(ctx context.Context, in *HangmanRequest, opts ...grpc.CallOption) (*HangmanReply, error)
-	Guess(ctx context.Context, in *GuessRequest, opts ...grpc.CallOption) (*GuessReply, error)
+	NewGallow(ctx context.Context, in *HangmanRequest, opts ...grpc.CallOption) (*HangmanReply, error)
+	ListGallows(ctx context.Context, in *HangmanRequest, opts ...grpc.CallOption) (*HangmanReply, error)
+	ResumeGallow(ctx context.Context, in *HangmanRequest, opts ...grpc.CallOption) (*HangmanReply, error)
+	GuessLetter(ctx context.Context, in *GuessRequest, opts ...grpc.CallOption) (*GuessReply, error)
 }
 
 type hangmanClient struct {
@@ -182,36 +190,36 @@ func NewHangmanClient(cc *grpc.ClientConn) HangmanClient {
 	return &hangmanClient{cc}
 }
 
-func (c *hangmanClient) New(ctx context.Context, in *HangmanRequest, opts ...grpc.CallOption) (*HangmanReply, error) {
+func (c *hangmanClient) NewGallow(ctx context.Context, in *HangmanRequest, opts ...grpc.CallOption) (*HangmanReply, error) {
 	out := new(HangmanReply)
-	err := grpc.Invoke(ctx, "/Hangman/New", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/Hangman/NewGallow", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *hangmanClient) List(ctx context.Context, in *HangmanRequest, opts ...grpc.CallOption) (*HangmanReply, error) {
+func (c *hangmanClient) ListGallows(ctx context.Context, in *HangmanRequest, opts ...grpc.CallOption) (*HangmanReply, error) {
 	out := new(HangmanReply)
-	err := grpc.Invoke(ctx, "/Hangman/List", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/Hangman/ListGallows", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *hangmanClient) Resume(ctx context.Context, in *HangmanRequest, opts ...grpc.CallOption) (*HangmanReply, error) {
+func (c *hangmanClient) ResumeGallow(ctx context.Context, in *HangmanRequest, opts ...grpc.CallOption) (*HangmanReply, error) {
 	out := new(HangmanReply)
-	err := grpc.Invoke(ctx, "/Hangman/Resume", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/Hangman/ResumeGallow", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *hangmanClient) Guess(ctx context.Context, in *GuessRequest, opts ...grpc.CallOption) (*GuessReply, error) {
+func (c *hangmanClient) GuessLetter(ctx context.Context, in *GuessRequest, opts ...grpc.CallOption) (*GuessReply, error) {
 	out := new(GuessReply)
-	err := grpc.Invoke(ctx, "/Hangman/Guess", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/Hangman/GuessLetter", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -221,84 +229,84 @@ func (c *hangmanClient) Guess(ctx context.Context, in *GuessRequest, opts ...grp
 // Server API for Hangman service
 
 type HangmanServer interface {
-	New(context.Context, *HangmanRequest) (*HangmanReply, error)
-	List(context.Context, *HangmanRequest) (*HangmanReply, error)
-	Resume(context.Context, *HangmanRequest) (*HangmanReply, error)
-	Guess(context.Context, *GuessRequest) (*GuessReply, error)
+	NewGallow(context.Context, *HangmanRequest) (*HangmanReply, error)
+	ListGallows(context.Context, *HangmanRequest) (*HangmanReply, error)
+	ResumeGallow(context.Context, *HangmanRequest) (*HangmanReply, error)
+	GuessLetter(context.Context, *GuessRequest) (*GuessReply, error)
 }
 
 func RegisterHangmanServer(s *grpc.Server, srv HangmanServer) {
 	s.RegisterService(&_Hangman_serviceDesc, srv)
 }
 
-func _Hangman_New_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Hangman_NewGallow_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(HangmanRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(HangmanServer).New(ctx, in)
+		return srv.(HangmanServer).NewGallow(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Hangman/New",
+		FullMethod: "/Hangman/NewGallow",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(HangmanServer).New(ctx, req.(*HangmanRequest))
+		return srv.(HangmanServer).NewGallow(ctx, req.(*HangmanRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Hangman_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Hangman_ListGallows_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(HangmanRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(HangmanServer).List(ctx, in)
+		return srv.(HangmanServer).ListGallows(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Hangman/List",
+		FullMethod: "/Hangman/ListGallows",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(HangmanServer).List(ctx, req.(*HangmanRequest))
+		return srv.(HangmanServer).ListGallows(ctx, req.(*HangmanRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Hangman_Resume_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Hangman_ResumeGallow_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(HangmanRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(HangmanServer).Resume(ctx, in)
+		return srv.(HangmanServer).ResumeGallow(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Hangman/Resume",
+		FullMethod: "/Hangman/ResumeGallow",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(HangmanServer).Resume(ctx, req.(*HangmanRequest))
+		return srv.(HangmanServer).ResumeGallow(ctx, req.(*HangmanRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Hangman_Guess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Hangman_GuessLetter_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GuessRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(HangmanServer).Guess(ctx, in)
+		return srv.(HangmanServer).GuessLetter(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/Hangman/Guess",
+		FullMethod: "/Hangman/GuessLetter",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(HangmanServer).Guess(ctx, req.(*GuessRequest))
+		return srv.(HangmanServer).GuessLetter(ctx, req.(*GuessRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -308,20 +316,20 @@ var _Hangman_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*HangmanServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "New",
-			Handler:    _Hangman_New_Handler,
+			MethodName: "NewGallow",
+			Handler:    _Hangman_NewGallow_Handler,
 		},
 		{
-			MethodName: "List",
-			Handler:    _Hangman_List_Handler,
+			MethodName: "ListGallows",
+			Handler:    _Hangman_ListGallows_Handler,
 		},
 		{
-			MethodName: "Resume",
-			Handler:    _Hangman_Resume_Handler,
+			MethodName: "ResumeGallow",
+			Handler:    _Hangman_ResumeGallow_Handler,
 		},
 		{
-			MethodName: "Guess",
-			Handler:    _Hangman_Guess_Handler,
+			MethodName: "GuessLetter",
+			Handler:    _Hangman_GuessLetter_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -331,23 +339,25 @@ var _Hangman_serviceDesc = grpc.ServiceDesc{
 func init() { proto.RegisterFile("api.proto", fileDescriptor0) }
 
 var fileDescriptor0 = []byte{
-	// 281 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x91, 0x4d, 0x4e, 0xc3, 0x30,
-	0x10, 0x85, 0x9b, 0x5f, 0x9a, 0x69, 0x1b, 0x24, 0x2f, 0x50, 0x88, 0x58, 0x44, 0x96, 0x80, 0xc0,
-	0xc2, 0x8b, 0x72, 0x85, 0x4a, 0x05, 0xa9, 0x42, 0xc8, 0x37, 0x30, 0xca, 0xb4, 0x58, 0xca, 0x1f,
-	0xb1, 0xa3, 0x8a, 0x53, 0x71, 0x45, 0x14, 0xd7, 0xf4, 0x6f, 0xd5, 0x5d, 0xde, 0xcb, 0x9b, 0x6f,
-	0xec, 0x67, 0x88, 0x44, 0x2b, 0x59, 0xdb, 0x35, 0xba, 0xa1, 0x19, 0xc4, 0xaf, 0xa2, 0xde, 0x54,
-	0xa2, 0xe6, 0xf8, 0xdd, 0xa3, 0xd2, 0x24, 0x06, 0x57, 0x16, 0x89, 0x93, 0x39, 0x79, 0xc0, 0x5d,
-	0x59, 0xd0, 0x27, 0x98, 0xee, 0x13, 0x6d, 0xf9, 0x43, 0x6e, 0xc1, 0xdf, 0x88, 0x0a, 0x13, 0x27,
-	0xf3, 0xf2, 0xc9, 0x3c, 0x60, 0x4b, 0x51, 0x21, 0x37, 0x16, 0x65, 0xe0, 0x0f, 0xea, 0x1c, 0x41,
-	0x6e, 0x20, 0x54, 0x5a, 0xe8, 0x5e, 0x25, 0x6e, 0xe6, 0xe4, 0x63, 0x6e, 0x15, 0x5d, 0xc0, 0x74,
-	0xd9, 0xa3, 0x52, 0xff, 0xab, 0xef, 0x20, 0xfa, 0xda, 0xad, 0x7a, 0x5b, 0xd8, 0xf1, 0x83, 0x31,
-	0x50, 0x4a, 0xd4, 0x1a, 0x3b, 0x43, 0x89, 0xb8, 0x55, 0xb4, 0x00, 0xb0, 0x94, 0xe1, 0x78, 0x29,
-	0x8c, 0x4b, 0xb9, 0xc6, 0x15, 0xae, 0xb5, 0x45, 0xec, 0x35, 0x21, 0xe0, 0x6f, 0x9b, 0xae, 0xb0,
-	0xf3, 0xe6, 0x9b, 0x3c, 0x40, 0xbc, 0xe3, 0x7c, 0x34, 0x4a, 0x6a, 0xd9, 0xd4, 0x89, 0x67, 0xfe,
-	0x9e, 0xb9, 0xf3, 0x5f, 0x07, 0xae, 0x6c, 0x0f, 0xe4, 0x11, 0xbc, 0x77, 0xdc, 0x92, 0x6b, 0x76,
-	0x5a, 0x5d, 0x3a, 0x63, 0xc7, 0x4d, 0xd1, 0x11, 0xc9, 0xc1, 0x5f, 0x49, 0xa5, 0x2f, 0x48, 0x3e,
-	0x43, 0xc8, 0x51, 0xf5, 0x15, 0x5e, 0x90, 0xbd, 0x87, 0xc0, 0x5c, 0x98, 0xcc, 0xd8, 0x71, 0x7d,
-	0xe9, 0x84, 0x1d, 0x7a, 0xa0, 0xa3, 0xcf, 0xd0, 0xbc, 0xf0, 0xcb, 0x5f, 0x00, 0x00, 0x00, 0xff,
-	0xff, 0xdb, 0xd5, 0x01, 0x3b, 0xee, 0x01, 0x00, 0x00,
+	// 307 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x8c, 0x92, 0xdf, 0x6a, 0xc2, 0x30,
+	0x14, 0xc6, 0x8d, 0x7f, 0xaa, 0x3d, 0x55, 0x07, 0xb9, 0x18, 0x45, 0x84, 0x95, 0x5c, 0x0c, 0x61,
+	0x2c, 0x8a, 0x7b, 0x05, 0xc1, 0x0d, 0x64, 0x8c, 0xb0, 0x17, 0xc8, 0x30, 0xba, 0x40, 0x6c, 0xba,
+	0x26, 0xa5, 0xec, 0x76, 0x4f, 0xb7, 0xc7, 0x1a, 0x4d, 0x63, 0x75, 0x5e, 0x79, 0xd7, 0xef, 0x6b,
+	0xf2, 0x3b, 0x87, 0x1f, 0x81, 0x90, 0x67, 0x92, 0x66, 0xb9, 0xb6, 0x9a, 0x24, 0x30, 0x7e, 0xe6,
+	0xe9, 0xfe, 0xc0, 0x53, 0x26, 0xbe, 0x0a, 0x61, 0x2c, 0x1e, 0x43, 0x5b, 0x6e, 0x63, 0x94, 0xa0,
+	0x59, 0x8f, 0xb5, 0xe5, 0x96, 0xcc, 0x61, 0xd8, 0x9c, 0xc8, 0xd4, 0x37, 0xbe, 0x83, 0x60, 0xcf,
+	0x95, 0xd2, 0x65, 0x8c, 0x92, 0xce, 0x2c, 0x5a, 0xf6, 0xe9, 0xda, 0x45, 0xe6, 0x6b, 0xb2, 0x80,
+	0xa0, 0x6e, 0x2e, 0x51, 0xf8, 0x16, 0x02, 0x63, 0xb9, 0x2d, 0x4c, 0xdc, 0x4e, 0xd0, 0x6c, 0xc0,
+	0x7c, 0x22, 0x2b, 0x18, 0xae, 0x0b, 0x61, 0xcc, 0x71, 0x85, 0x29, 0x84, 0x9f, 0xf5, 0xc8, 0x97,
+	0x95, 0xbf, 0x7e, 0x2a, 0x2a, 0x8a, 0x12, 0xd6, 0x8a, 0xdc, 0x51, 0x42, 0xe6, 0x13, 0xf9, 0x41,
+	0x00, 0x1e, 0x53, 0xed, 0x39, 0x85, 0x50, 0xc9, 0x9d, 0x78, 0xd7, 0x96, 0xab, 0x23, 0xa4, 0x29,
+	0xf0, 0x04, 0x06, 0x55, 0xd8, 0x88, 0x9d, 0x75, 0x98, 0x1e, 0x6b, 0x32, 0xc6, 0xd0, 0x2d, 0x75,
+	0xbe, 0x8d, 0x3b, 0x0e, 0xef, 0xbe, 0xf1, 0x3d, 0x8c, 0xeb, 0x31, 0x6f, 0xda, 0x48, 0x2b, 0x75,
+	0x1a, 0x77, 0xdd, 0xdf, 0x8b, 0x76, 0xf9, 0x8b, 0xa0, 0xef, 0x75, 0xe1, 0x47, 0x08, 0x5f, 0x45,
+	0xe9, 0x5d, 0xdc, 0xd0, 0xff, 0x9e, 0x27, 0x23, 0x7a, 0xae, 0x95, 0xb4, 0xf0, 0x1c, 0xa2, 0x8d,
+	0x34, 0xb6, 0x3e, 0x6f, 0xae, 0xb8, 0xb0, 0x80, 0x21, 0x13, 0xa6, 0x38, 0x88, 0xab, 0x47, 0x3c,
+	0x40, 0xe4, 0x0c, 0x6d, 0xdc, 0xd2, 0x78, 0x44, 0xcf, 0xb5, 0x4f, 0x22, 0x7a, 0xd2, 0x47, 0x5a,
+	0x1f, 0x81, 0x7b, 0x21, 0x4f, 0x7f, 0x01, 0x00, 0x00, 0xff, 0xff, 0x4d, 0xb3, 0xac, 0xa2, 0x2e,
+	0x02, 0x00, 0x00,
 }
