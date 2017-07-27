@@ -10,6 +10,8 @@ import (
 	"github.com/chzyer/readline"
 )
 
+var currentGame int32
+
 func main() {
 	l, err := readline.NewEx(&readline.Config{
 		Prompt:          "»",
@@ -43,24 +45,44 @@ func main() {
 
 		line = strings.TrimSpace(line)
 		// fmt.Print("\033[H\033[2J") // clear the screen
-
+	menu:
 		switch {
 		case line == "1" || line == "1 - new game":
 			r, err := newGallow(clt)
+			currentGame = r.Id
 			if err != nil {
 				log.Println(err)
 				break
 			}
-			fmt.Println("Game on! ID:", r.Id)
-			l.SetPrompt("Enter letter: ")
+			fmt.Printf(">>Game on!<<  the word is %v characters \n", len(r.WordMasked))
+			l.SetPrompt("(CTRL+C to main menu) Enter letter: ")
 			for {
 				letter, err := l.Readline()
 				if err != readline.ErrInterrupt {
-					if len(letter) != 0 {
-						guessLetter(clt)
-						fmt.Println(gallowArt[(len(gallowArt) - int(r.RetryLeft))])
-						fmt.Printf("Remaining attempts: %v \n", r.RetryLeft)
-						fmt.Println("Word:", r.WordMasked)
+					if len(letter) == 1 {
+						g, err := guessLetter(clt, currentGame, letter)
+						if err != nil {
+							fmt.Println(err)
+							continue
+						}
+
+						if g.Gallow.RetryLeft < 1 {
+							fmt.Print("\n>>>> Game Over Amigo , try another day! <<<<\n\n\n")
+							l.SetPrompt("»")
+							usage(l.Stdout())
+							break menu
+						}
+
+						fmt.Println(gallowArt[(len(gallowArt) - int(g.Gallow.RetryLeft))])
+						fmt.Printf("Remaining attempts: %v \n", g.Gallow.RetryLeft)
+						fmt.Printf("Incorrect attempts: ")
+						for _, v := range g.Gallow.IncorrectGuesses {
+							fmt.Print(v.Letter, " ")
+						}
+
+						fmt.Println("\nWord hint:", g.Gallow.WordMasked)
+					} else {
+						fmt.Println("Please provide a single letter")
 					}
 					continue
 				} else {

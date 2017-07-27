@@ -22,8 +22,8 @@ message Gallow{
 	int32 		RetryLeft=3;
 	string 		Word=4;
 	string 		WordMasked=5;
-	repeated 	GuessRequest Guesses=6;
-
+	repeated 	GuessRequest IncorrectGuesses=6;
+	bool 			Status=7;
 }
 
 message GuessRequest {
@@ -33,5 +33,4 @@ message GuessRequest {
 
 message GuessReply {
 	Gallow 	Gallow=1;
-	int32 	LetterPosition=4	; // -1 means the letter doesn't exist in the word
 }

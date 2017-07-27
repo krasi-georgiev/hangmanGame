@@ -1,21 +1,21 @@
 package main
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/krasi-georgiev/hangmanGame/api"
 )
 
-func guessLetter(client api.HangmanClient) error {
+func guessLetter(client api.HangmanClient, id int32, l string) (*api.GuessReply, error) {
 	ctx, cancel := appContext()
 	defer cancel()
-	guess, err := client.GuessLetter(ctx, &api.GuessRequest{})
-	if err != nil {
-		return err
+
+	if id > 0 {
+		guess, err := client.GuessLetter(ctx, &api.GuessRequest{GallowID: id, Letter: l})
+		if err != nil {
+			return nil, err
+		}
+		return guess, nil
 	}
-
-	fmt.Println("sdfsdf")
-	fmt.Println(guess)
-
-	return nil
+	return nil, errors.New("Invalid Game ID")
 }
