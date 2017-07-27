@@ -1,0 +1,10 @@
+ignored = ["github.com/krasi-georgiev/hangmanGame/api"]
+
+
+[[dependencies]]
+  branch = "master"
+  name = "github.com/chzyer/readline"
+
+[[dependencies]]
+  branch = "master"
+  name = "google.golang.org/grpc"

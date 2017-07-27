@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/chzyer/readline"
@@ -109,13 +110,28 @@ func main() {
 					}
 					fmt.Println(v.Id, "	", status, "	", v.RetryLeft, "		", v.WordMasked)
 				}
+			} else {
+				fmt.Println("No saved games on the server!")
+				usage(l.Stdout())
+				break menu
 			}
 			l.SetPrompt("Enter game ID to resume: ")
 			for {
 				gameID, err := l.Readline()
 				if err != readline.ErrInterrupt {
 					if len(gameID) != 0 {
-
+						i, _ := strconv.Atoi(gameID)
+						if err != nil {
+							log.Println("Invalid Game ID")
+							continue
+						} else {
+							r, err := resumeGallow(clt, i)
+							if err != nil {
+								log.Println(err)
+								continue
+							}
+							fmt.Println(r)
+						}
 					}
 					continue
 				} else {

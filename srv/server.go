@@ -41,8 +41,15 @@ func (s *hangman) ListGallows(context.Context, *api.GallowRequest) (*api.GallowR
 	d := &api.GallowReply{Gallow: s.slaughter}
 	return d, nil
 }
-func (s *hangman) ResumeGallow(context.Context, *api.GallowRequest) (*api.GallowReply, error) {
-	return nil, nil
+func (s *hangman) ResumeGallow(ctx context.Context, r *api.GallowRequest) (*api.GallowReply, error) {
+	// stay in range of the slice
+	if int32(len(s.slaughter)) >= r.Id {
+		if s.slaughter[r.Id-1].RetryLeft < 1 || s.slaughter[r.Id-1].Status {
+			return nil, errors.New("Game is played by someone else or doesn't have any retries left")
+		}
+		return &api.GallowReply{Gallow: s.slaughter[r.Id-1 : r.Id]}, nil
+	}
+	return nil, errors.New("Invalid Game ID")
 }
 func (s *hangman) GuessLetter(ctx context.Context, r *api.GuessRequest) (*api.GuessReply, error) {
 	// stay in range of the slice
