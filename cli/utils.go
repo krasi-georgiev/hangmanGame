@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"time"
+	"io"
+
 
 	"github.com/krasi-georgiev/hangmanGame/api"
 	"google.golang.org/grpc"
@@ -109,4 +111,8 @@ func appContext() (context.Context, context.CancelFunc) {
 	// }
 
 	return context.WithTimeout(ctx, timeout)
+}
+
+func usage(w io.Writer) {
+	io.WriteString(w, completer.Tree("    "))
 }

@@ -29,7 +29,7 @@ func (s *hangman) NewGallow(ctx context.Context, r *api.GallowRequest) (*api.Gal
 	word := words[wordID]
 	wordMAsked := strings.Repeat("_", utf8.RuneCountInString(word))
 	gallowID := int32(len(s.slaughter) + 1) // generate an id sequence starting from 1
-	s.slaughter = append(s.slaughter, &api.Gallow{Id: gallowID, Word: word, WordMasked: wordMAsked, RetryLimit: r.RetryLimit, RetryLeft: r.RetryLimit})
+	s.slaughter = append(s.slaughter, &api.Gallow{Id: gallowID, Word: word, WordMasked: wordMAsked, RetryLimit: r.RetryLimit, RetryLeft: r.RetryLimit, Status: true})
 
 	g := s.slaughter[gallowID-1 : gallowID]
 	d := *g[0]  // need to dereference so we don't change the original struct

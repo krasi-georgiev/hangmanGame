@@ -10,7 +10,11 @@ import (
 	"github.com/chzyer/readline"
 )
 
-var currentGame int32
+var completer = readline.NewPrefixCompleter(
+	readline.PcItem("1 - new game"),
+	readline.PcItem("2 - saved games"),
+	readline.PcItem("3 - exit"),
+)
 
 func main() {
 	l, err := readline.NewEx(&readline.Config{
@@ -20,7 +24,7 @@ func main() {
 		EOFPrompt:       "exit",
 	})
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 	defer l.Close()
 
@@ -44,12 +48,11 @@ func main() {
 		}
 
 		line = strings.TrimSpace(line)
-		// fmt.Print("\033[H\033[2J") // clear the screen
+
 	menu:
 		switch {
 		case line == "1" || line == "1 - new game":
 			r, err := newGallow(clt)
-			currentGame = r.Id
 			if err != nil {
 				log.Println(err)
 				break
@@ -60,7 +63,7 @@ func main() {
 				letter, err := l.Readline()
 				if err != readline.ErrInterrupt {
 					if len(letter) == 1 {
-						g, err := guessLetter(clt, currentGame, letter)
+						g, err := guessLetter(clt, r.Id, letter)
 						if err != nil {
 							fmt.Println(err)
 							continue
@@ -79,7 +82,6 @@ func main() {
 						for _, v := range g.Gallow.IncorrectGuesses {
 							fmt.Print(v.Letter, " ")
 						}
-
 						fmt.Println("\nWord hint:", g.Gallow.WordMasked)
 					} else {
 						fmt.Println("Please provide a single letter")
@@ -98,9 +100,17 @@ func main() {
 				log.Println(err)
 				break
 			}
-
-			fmt.Println(r)
-			l.SetPrompt("Enter game ID to continue playing: ")
+			if r != nil {
+				fmt.Println("ID	Status	Remainig attempts	Hint")
+				for _, v := range r {
+					status := "      "
+					if v.Status {
+						status = "locked"
+					}
+					fmt.Println(v.Id, "	", status, "	", v.RetryLeft, "		", v.WordMasked)
+				}
+			}
+			l.SetPrompt("Enter game ID to resume: ")
 			for {
 				gameID, err := l.Readline()
 				if err != readline.ErrInterrupt {
@@ -108,9 +118,12 @@ func main() {
 
 					}
 					continue
+				} else {
+					l.SetPrompt("»")
+					usage(l.Stdout())
+					break
 				}
 			}
-
 		case line == "3" || line == "3 - exit":
 			os.Exit(1)
 		default:
@@ -118,13 +131,3 @@ func main() {
 		}
 	}
 }
-
-func usage(w io.Writer) {
-	io.WriteString(w, completer.Tree("    "))
-}
-
-var completer = readline.NewPrefixCompleter(
-	readline.PcItem("1 - new game"),
-	readline.PcItem("2 - saved games"),
-	readline.PcItem("3 - exit"),
-)
