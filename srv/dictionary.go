@@ -1,16 +1,5 @@
 package main
 
-import (
-	"errors"
-	"math/rand"
-	"strings"
-	"unicode/utf8"
-
-	"golang.org/x/net/context"
-
-	"github.com/krasi-georgiev/hangmanGame/api"
-)
-
 var words = []string{
 	"abruptly",
 	"absurd",
@@ -225,15 +214,3 @@ var words = []string{
 	"zipper",
 	"zodiac",
 	"zombie"}
-
-func (s *hangman) NewGallow(ctx context.Context, r *api.GallowRequest) (*api.GallowReply, error) {
-	if r.RetryLimit < 1 {
-		return nil, errors.New("Please specify retry limit for this hangman")
-	}
-	id := int32(len(s.slaughter) + 1)
-	wordID := rand.Intn(int(len(words)))
-	word := words[wordID]
-	wordMAsked := strings.Repeat("_", utf8.RuneCountInString(word))
-	s.slaughter = append(s.slaughter, &api.Gallow{Id: id, Word: word, WordMasked: wordMAsked, RetryLimit: r.RetryLimit, RetryLeft: r.RetryLimit})
-	return &api.GallowReply{Gallow: s.slaughter[id-1 : id]}, nil
-}

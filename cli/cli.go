@@ -42,23 +42,25 @@ func main() {
 		}
 
 		line = strings.TrimSpace(line)
+		// fmt.Print("\033[H\033[2J") // clear the screen
 
 		switch {
-
 		case line == "1" || line == "1 - new game":
 			r, err := newGallow(clt)
 			if err != nil {
 				log.Println(err)
 				break
 			}
-			fmt.Println(r)
-			fmt.Println("Game on!")
+			fmt.Println("Game on! ID:", r.Id)
 			l.SetPrompt("Enter letter: ")
 			for {
 				letter, err := l.Readline()
 				if err != readline.ErrInterrupt {
 					if len(letter) != 0 {
 						guessLetter(clt)
+						fmt.Println(gallowArt[(len(gallowArt) - int(r.RetryLeft))])
+						fmt.Printf("Remaining attempts: %v \n", r.RetryLeft)
+						fmt.Println("Word:", r.WordMasked)
 					}
 					continue
 				} else {
@@ -69,7 +71,24 @@ func main() {
 			}
 
 		case line == "2" || line == "2 - saved games":
-			listGallows(clt)
+			r, err := listGallows(clt)
+			if err != nil {
+				log.Println(err)
+				break
+			}
+
+			fmt.Println(r)
+			l.SetPrompt("Enter game ID to continue playing: ")
+			for {
+				gameID, err := l.Readline()
+				if err != readline.ErrInterrupt {
+					if len(gameID) != 0 {
+
+					}
+					continue
+				}
+			}
+
 		case line == "3" || line == "3 - exit":
 			os.Exit(1)
 		default:

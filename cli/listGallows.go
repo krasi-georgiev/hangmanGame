@@ -1,21 +1,16 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/krasi-georgiev/hangmanGame/api"
 )
 
-func listGallows(client api.HangmanClient) error {
+func listGallows(client api.HangmanClient) ([]*api.Gallow, error) {
 	ctx, cancel := appContext()
 	defer cancel()
-	games, err := client.ListGallows(ctx, &api.GallowRequest{})
+	games, err := client.ListGallows(ctx, &api.GallowRequest{Id: -1})
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	fmt.Println("sdfsdf")
-	fmt.Println(games)
-
-	return nil
+	return games.Gallow, nil
 }
