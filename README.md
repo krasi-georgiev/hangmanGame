@@ -1,4 +1,4 @@
-## Grpc based golang implementation of the hangman game
+## Golang implementation of the hangman game using a grpc client and server
 
 ### Game options 
 * Starting a new game
