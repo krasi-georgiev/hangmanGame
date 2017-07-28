@@ -5,7 +5,6 @@ import (
 	"io"
 	"log"
 	"os"
-	"strconv"
 	"strings"
 
 	"github.com/chzyer/readline"
@@ -34,7 +33,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	usage(l.Stdout())
+	usage(l)
 
 	for {
 		line, err := l.Readline()
@@ -49,117 +48,94 @@ func main() {
 		}
 
 		line = strings.TrimSpace(line)
+		menu := line[0:1] // to simplify the select statment just take the first character of the user input
 
 	menu:
 		switch {
-		case line == "1" || line == "1 - new game":
-			r, err := newGallow(clt)
+		case menu == "1":
+			g, err := newGallow(clt)
 			if err != nil {
-				log.Println(err)
-				break
+				fmt.Println(err)
+				break menu
 			}
-			fmt.Printf(">>Game on!<<  the word is %v characters \n", len(r.WordMasked))
+			fmt.Printf(">>Game on!<<  the word hint is %v \n", g.WordMasked)
 			l.SetPrompt("(CTRL+C to main menu) Enter letter: ")
 			for {
 				letter, err := l.Readline()
 				if err != readline.ErrInterrupt {
-					if err := guessLetter(clt, r.Id, letter); err != nil {
+					r, err := guessLetter(clt, g, letter)
+					if err != nil {
 						fmt.Println(err)
 
-						if er := saveGallow(clt, r.Id); er != nil {
+						if er := saveGallow(clt, g); er != nil {
 							fmt.Println(err)
 						}
-
-						l.SetPrompt("»")
-						usage(l.Stdout())
+						usage(l)
 						break menu
 					}
+					fmt.Println(r)
 					continue
 				} else {
-					if err := saveGallow(clt, r.Id); err != nil {
+					if err := saveGallow(clt, g); err != nil {
 						fmt.Println(err)
 					}
-					l.SetPrompt("»")
-					usage(l.Stdout())
+					usage(l)
 					break menu
 				}
 			}
 
-		case line == "2" || line == "2 - saved games":
+		case menu == "2":
 			r, err := listGallows(clt)
 			if err != nil {
 				log.Println(err)
-				break
-			}
-			if r != nil {
-				fmt.Println("ID	Status		Attempts Left	Hint")
-				for _, v := range r {
-					status := "      "
-					if v.Status {
-						status = "in progress"
-					}
-					fmt.Println(v.Id, "	", status, "	", v.RetryLeft, "		", v.WordMasked)
-				}
-			} else {
-				fmt.Println("No saved games on the server!")
 				break menu
 			}
-			l.SetPrompt("Enter game ID to resume: ")
+			fmt.Println(r)
+
+			l.SetPrompt("(CTRL+C to main menu) Enter game ID to resume: ")
 			for {
 				gameID, err := l.Readline()
 				if err != readline.ErrInterrupt {
-					if len(gameID) != 0 {
-						i, _ := strconv.Atoi(gameID)
-						if err != nil {
-							log.Println("Invalid Game ID")
+					r, err := resumeGallow(clt, gameID)
+					if err != nil {
+						log.Println(err)
+						continue
+					}
+
+					fmt.Printf(">>Game on!<<  word hint is : %v \n", r.WordMasked)
+					l.SetPrompt("(CTRL+C to main menu) Enter letter: ")
+					for {
+						letter, err := l.Readline()
+						if err != readline.ErrInterrupt {
+							rr, err := guessLetter(clt, r, letter)
+							if err != nil {
+								fmt.Println(err)
+								if er := saveGallow(clt, r); er != nil {
+									fmt.Println(err)
+								}
+
+								usage(l)
+								break menu
+							}
+							fmt.Println(rr)
 							continue
 						} else {
-							r, err := resumeGallow(clt, i)
-							if err != nil {
-								log.Println(err)
-								continue
+							if err := saveGallow(clt, r); err != nil {
+								fmt.Println(err)
 							}
-
-							fmt.Printf(">>Game on!<<  word hint is : %v \n", r.WordMasked)
-							l.SetPrompt("(CTRL+C to main menu) Enter letter: ")
-							for {
-								letter, err := l.Readline()
-								if err != readline.ErrInterrupt {
-									if err := guessLetter(clt, r.Id, letter); err != nil {
-										fmt.Println(err)
-
-										if er := saveGallow(clt, r.Id); er != nil {
-											fmt.Println(err)
-										}
-
-										l.SetPrompt("»")
-										usage(l.Stdout())
-										break menu
-									}
-									continue
-								} else {
-									if err := saveGallow(clt, r.Id); err != nil {
-										fmt.Println(err)
-									}
-									l.SetPrompt("»")
-									usage(l.Stdout())
-									break menu
-								}
-							}
-
+							usage(l)
+							break menu
 						}
 					}
-					continue
 				} else {
-					l.SetPrompt("»")
-					usage(l.Stdout())
+					usage(l)
 					break
 				}
 			}
-		case line == "3" || line == "3 - exit":
+		case menu == "3":
 			os.Exit(1)
 		default:
-			usage(l.Stdout())
+			usage(l)
 		}
 	}
 }

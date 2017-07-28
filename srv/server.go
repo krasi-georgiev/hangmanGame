@@ -47,10 +47,10 @@ func (s *hangman) ResumeGallow(ctx context.Context, r *api.GallowRequest) (*api.
 	r.Id--
 	if int32(len(s.slaughter)) > r.Id {
 		if s.slaughter[r.Id].RetryLeft < 1 {
-			return nil, errors.New("Game is played by someone else")
+			return nil, errors.New("This game is over")
 		}
 		if s.slaughter[r.Id].Status {
-			return nil, errors.New("This game is over")
+			return nil, errors.New("Game is played by someone else")
 		}
 
 		s.slaughter[r.Id].Status = true // lock the game

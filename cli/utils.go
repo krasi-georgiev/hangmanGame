@@ -9,6 +9,8 @@ import (
 
 	"github.com/krasi-georgiev/hangmanGame/api"
 	"google.golang.org/grpc"
+	"github.com/chzyer/readline"
+
 )
 
 var grpcClient api.HangmanClient
@@ -106,6 +108,7 @@ func appContext() (context.Context, context.CancelFunc) {
 	return context.WithTimeout(ctx, timeout)
 }
 
-func usage(w io.Writer) {
-	io.WriteString(w, completer.Tree("    "))
+func usage(w *readline.Instance) {
+	w.SetPrompt("»")
+	io.WriteString(w.Stdout(), completer.Tree("    "))
 }
