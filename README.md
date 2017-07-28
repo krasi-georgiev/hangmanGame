@@ -2,8 +2,7 @@
 
 ### Game options 
 * Starting a new game
-* Saving a game
-* Saved games persist in the server memory.
+* Saving a game (persist in memory untill server restart)
 * Resuming a saved game
 * Listing Saved games
 * Concurrent players
