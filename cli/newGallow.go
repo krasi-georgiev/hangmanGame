@@ -11,5 +11,5 @@ func newGallow(client api.HangmanClient) (*api.Gallow, error) {
 	if err != nil {
 		return nil, err
 	}
-	return r.Gallow[0], nil
+	return r, nil
 }

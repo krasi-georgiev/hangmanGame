@@ -1,10 +1,11 @@
 syntax = "proto3";
 
 service Hangman {
-	rpc NewGallow(GallowRequest) returns (GallowReply){};
-	rpc ListGallows(GallowRequest) returns (GallowReply){};
-	rpc ResumeGallow(GallowRequest) returns (GallowReply){};
-	rpc GuessLetter(GuessRequest) returns (GuessReply){};
+	rpc NewGallow(GallowRequest) returns (Gallow){};
+	rpc ListGallows(GallowRequest) returns (GallowArray){};
+	rpc ResumeGallow(GallowRequest) returns (Gallow){};
+	rpc SaveGallow(GallowRequest) returns (Gallow){};
+	rpc GuessLetter(GuessRequest) returns (Gallow){};
 }
 
 message GallowRequest {
@@ -12,7 +13,7 @@ message GallowRequest {
 	int32 RetryLimit=2;
 }
 
-message GallowReply {
+message GallowArray {
 	repeated Gallow Gallow=1;
 }
 
@@ -29,8 +30,4 @@ message Gallow{
 message GuessRequest {
 	int32 	GallowID = 1;
 	string 	Letter = 2;
-}
-
-message GuessReply {
-	Gallow 	Gallow=1;
 }

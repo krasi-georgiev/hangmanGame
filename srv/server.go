@@ -19,7 +19,7 @@ type hangman struct {
 	slaughter []*api.Gallow
 }
 
-func (s *hangman) NewGallow(ctx context.Context, r *api.GallowRequest) (*api.GallowReply, error) {
+func (s *hangman) NewGallow(ctx context.Context, r *api.GallowRequest) (*api.Gallow, error) {
 	if r.RetryLimit < 1 {
 		return nil, errors.New("Please specify retry limit for this hangman")
 	}
@@ -34,28 +34,49 @@ func (s *hangman) NewGallow(ctx context.Context, r *api.GallowRequest) (*api.Gal
 	g := s.slaughter[gallowID-1 : gallowID]
 	d := *g[0]  // need to dereference so we don't change the original struct
 	d.Word = "" // don't sent the naked word to the client , to avoid cheating clients :)
-	return &api.GallowReply{Gallow: []*api.Gallow{&d}}, nil
+	return &d, nil
 }
 
-func (s *hangman) ListGallows(context.Context, *api.GallowRequest) (*api.GallowReply, error) {
-	d := &api.GallowReply{Gallow: s.slaughter}
+func (s *hangman) ListGallows(context.Context, *api.GallowRequest) (*api.GallowArray, error) {
+	d := &api.GallowArray{Gallow: s.slaughter}
 	return d, nil
 }
-func (s *hangman) ResumeGallow(ctx context.Context, r *api.GallowRequest) (*api.GallowReply, error) {
+
+func (s *hangman) ResumeGallow(ctx context.Context, r *api.GallowRequest) (*api.Gallow, error) {
 	// stay in range of the slice
-	if int32(len(s.slaughter)) >= r.Id {
-		if s.slaughter[r.Id-1].RetryLeft < 1 || s.slaughter[r.Id-1].Status {
-			return nil, errors.New("Game is played by someone else or doesn't have any retries left")
+	r.Id--
+	if int32(len(s.slaughter)) > r.Id {
+		if s.slaughter[r.Id].RetryLeft < 1 {
+			return nil, errors.New("Game is played by someone else")
 		}
-		return &api.GallowReply{Gallow: s.slaughter[r.Id-1 : r.Id]}, nil
+		if s.slaughter[r.Id].Status {
+			return nil, errors.New("This game is over")
+		}
+
+		s.slaughter[r.Id].Status = true // lock the game
+		d := *s.slaughter[r.Id]         // need to dereference so we don't change the original struct
+		d.Word = ""                     // don't sent the naked word to the client , to avoid cheating clients :)
+		return &d, nil
 	}
 	return nil, errors.New("Invalid Game ID")
 }
-func (s *hangman) GuessLetter(ctx context.Context, r *api.GuessRequest) (*api.GuessReply, error) {
+
+func (s *hangman) SaveGallow(ctx context.Context, r *api.GallowRequest) (*api.Gallow, error) {
 	// stay in range of the slice
-	if int32(len(s.slaughter)) >= r.GallowID {
+	r.Id--
+	if int32(len(s.slaughter)) > r.Id {
+		s.slaughter[r.Id].Status = false
+		return s.slaughter[r.Id], nil
+	}
+	return nil, errors.New("Invalid Game ID")
+}
+
+func (s *hangman) GuessLetter(ctx context.Context, r *api.GuessRequest) (*api.Gallow, error) {
+	// stay in range of the slice
+	r.GallowID--
+	if int32(len(s.slaughter)) > r.GallowID {
 		r.Letter = strings.ToLower(r.Letter)
-		g := s.slaughter[r.GallowID-1]
+		g := s.slaughter[r.GallowID]
 
 		if g.RetryLeft < 1 {
 			return nil, errors.New("This game is over")
@@ -67,19 +88,20 @@ func (s *hangman) GuessLetter(ctx context.Context, r *api.GuessRequest) (*api.Gu
 			}
 		}
 		if strings.Index(g.Word, r.Letter) == -1 {
-			g.RetryLeft = g.RetryLeft - 1
-
 			contains := false
 			for _, v := range g.IncorrectGuesses {
 				if r.Letter == v.Letter {
 					contains = true
+				} else {
+
 				}
 			}
 			if !contains {
 				g.IncorrectGuesses = append(g.IncorrectGuesses, &api.GuessRequest{Letter: r.Letter})
+				g.RetryLeft = g.RetryLeft - 1
 			}
 		}
-		return &api.GuessReply{Gallow: g}, nil
+		return g, nil
 	}
 	return nil, errors.New("Invalid Game ID")
 }

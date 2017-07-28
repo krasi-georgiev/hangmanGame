@@ -63,35 +63,25 @@ func main() {
 			for {
 				letter, err := l.Readline()
 				if err != readline.ErrInterrupt {
-					if len(letter) == 1 {
-						g, err := guessLetter(clt, r.Id, letter)
-						if err != nil {
+					if err := guessLetter(clt, r.Id, letter); err != nil {
+						fmt.Println(err)
+
+						if er := saveGallow(clt, r.Id); er != nil {
 							fmt.Println(err)
-							continue
 						}
 
-						if g.Gallow.RetryLeft < 1 {
-							fmt.Print("\n>>>> Game Over Amigo , try another day! <<<<\n\n\n")
-							l.SetPrompt("»")
-							usage(l.Stdout())
-							break menu
-						}
-
-						fmt.Println(gallowArt[(len(gallowArt) - int(g.Gallow.RetryLeft))])
-						fmt.Printf("Remaining attempts: %v \n", g.Gallow.RetryLeft)
-						fmt.Printf("Incorrect attempts: ")
-						for _, v := range g.Gallow.IncorrectGuesses {
-							fmt.Print(v.Letter, " ")
-						}
-						fmt.Println("\nWord hint:", g.Gallow.WordMasked)
-					} else {
-						fmt.Println("Please provide a single letter")
+						l.SetPrompt("»")
+						usage(l.Stdout())
+						break menu
 					}
 					continue
 				} else {
+					if err := saveGallow(clt, r.Id); err != nil {
+						fmt.Println(err)
+					}
 					l.SetPrompt("»")
 					usage(l.Stdout())
-					break
+					break menu
 				}
 			}
 
@@ -102,17 +92,16 @@ func main() {
 				break
 			}
 			if r != nil {
-				fmt.Println("ID	Status	Remainig attempts	Hint")
+				fmt.Println("ID	Status		Attempts Left	Hint")
 				for _, v := range r {
 					status := "      "
 					if v.Status {
-						status = "locked"
+						status = "in progress"
 					}
 					fmt.Println(v.Id, "	", status, "	", v.RetryLeft, "		", v.WordMasked)
 				}
 			} else {
 				fmt.Println("No saved games on the server!")
-				usage(l.Stdout())
 				break menu
 			}
 			l.SetPrompt("Enter game ID to resume: ")
@@ -130,7 +119,34 @@ func main() {
 								log.Println(err)
 								continue
 							}
-							fmt.Println(r)
+
+							fmt.Printf(">>Game on!<<  word hint is : %v \n", r.WordMasked)
+							l.SetPrompt("(CTRL+C to main menu) Enter letter: ")
+							for {
+								letter, err := l.Readline()
+								if err != readline.ErrInterrupt {
+									if err := guessLetter(clt, r.Id, letter); err != nil {
+										fmt.Println(err)
+
+										if er := saveGallow(clt, r.Id); er != nil {
+											fmt.Println(err)
+										}
+
+										l.SetPrompt("»")
+										usage(l.Stdout())
+										break menu
+									}
+									continue
+								} else {
+									if err := saveGallow(clt, r.Id); err != nil {
+										fmt.Println(err)
+									}
+									l.SetPrompt("»")
+									usage(l.Stdout())
+									break menu
+								}
+							}
+
 						}
 					}
 					continue

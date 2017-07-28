@@ -103,13 +103,6 @@ func appContext() (context.Context, context.CancelFunc) {
 		ctx     = context.Background()
 		timeout = 2 * time.Second
 	)
-
-	// if timeout > 0 {
-	// 	ctx, cancel = context.WithTimeout(ctx, timeout)
-	// } else {
-	// 	ctx, cancel = context.WithCancel(ctx)
-	// }
-
 	return context.WithTimeout(ctx, timeout)
 }
 
