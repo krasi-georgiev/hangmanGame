@@ -28,24 +28,30 @@ func (s *hangman) NewGallow(ctx context.Context, r *api.GallowRequest) (*api.Gal
 	wordID := rand.Intn(len(words))
 	word := words[wordID]
 	wordMAsked := strings.Repeat("_", utf8.RuneCountInString(word))
-	gallowID := int32(len(s.slaughter) + 1) // generate an id sequence starting from 1
-	s.slaughter = append(s.slaughter, &api.Gallow{Id: gallowID, Word: word, WordMasked: wordMAsked, RetryLimit: r.RetryLimit, RetryLeft: r.RetryLimit, Status: true})
+	gallowID := int32(len(s.slaughter)) // generate an id sequence
 
-	g := s.slaughter[gallowID-1 : gallowID]
-	d := *g[0]  // need to dereference so we don't change the original struct
-	d.Word = "" // don't sent the naked word to the client , to avoid cheating clients :)
-	return &d, nil
+	if gallowID == 0 { // add one  gallow to fill the 0 slice element so our actual gallowID matches the slice positions
+		s.slaughter = append(s.slaughter, &api.Gallow{Id: 0, Status: true})
+		gallowID++
+	}
+	s.slaughter = append(s.slaughter, &api.Gallow{Id: gallowID, Word: word, WordMasked: wordMAsked, RetryLimit: r.RetryLimit, RetryLeft: r.RetryLimit, Status: true})
+	g := *s.slaughter[gallowID] // need to dereference so we don't change the original struct
+	g.Word = ""                 // don't sent the naked word to the client , to avoid cheating clients :)
+	return &g, nil
 }
 
 func (s *hangman) ListGallows(context.Context, *api.GallowRequest) (*api.GallowArray, error) {
 	d := &api.GallowArray{Gallow: s.slaughter}
+	if d.Gallow == nil {
+		return &api.GallowArray{}, nil
+	}
+	d.Gallow = d.Gallow[1:] // don't neet the 0 element as it is only a fake filling
 	return d, nil
 }
 
 func (s *hangman) ResumeGallow(ctx context.Context, r *api.GallowRequest) (*api.Gallow, error) {
 	// stay in range of the slice
-	r.Id--
-	if int32(len(s.slaughter)) > r.Id {
+	if r.Id > 0 && int32(len(s.slaughter)) > r.Id {
 		if s.slaughter[r.Id].RetryLeft < 1 {
 			return nil, errors.New("This game is over")
 		}
@@ -63,8 +69,7 @@ func (s *hangman) ResumeGallow(ctx context.Context, r *api.GallowRequest) (*api.
 
 func (s *hangman) SaveGallow(ctx context.Context, r *api.GallowRequest) (*api.Gallow, error) {
 	// stay in range of the slice
-	r.Id--
-	if int32(len(s.slaughter)) > r.Id {
+	if r.Id > 0 && int32(len(s.slaughter)) > r.Id {
 		s.slaughter[r.Id].Status = false
 		return s.slaughter[r.Id], nil
 	}
@@ -73,11 +78,9 @@ func (s *hangman) SaveGallow(ctx context.Context, r *api.GallowRequest) (*api.Ga
 
 func (s *hangman) GuessLetter(ctx context.Context, r *api.GuessRequest) (*api.Gallow, error) {
 	// stay in range of the slice
-	r.GallowID--
-	if int32(len(s.slaughter)) > r.GallowID {
+	if r.GallowID > 0 && int32(len(s.slaughter)) > r.GallowID {
 		r.Letter = strings.ToLower(r.Letter)
 		g := s.slaughter[r.GallowID]
-
 		if g.RetryLeft < 1 {
 			return nil, errors.New("This game is over")
 		}
@@ -101,7 +104,9 @@ func (s *hangman) GuessLetter(ctx context.Context, r *api.GuessRequest) (*api.Ga
 				g.RetryLeft = g.RetryLeft - 1
 			}
 		}
-		return g, nil
+		gg := *g     // need to dereference so we don't change the original struct
+		gg.Word = "" // don't sent the naked word to the client , to avoid cheating clients :)
+		return &gg, nil
 	}
 	return nil, errors.New("Invalid Game ID")
 }

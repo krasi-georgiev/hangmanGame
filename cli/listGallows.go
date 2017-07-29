@@ -18,7 +18,7 @@ func listGallows(client api.HangmanClient) (string, error) {
 		return "", err
 	}
 
-	if r != nil {
+	if len(r.Gallow) > 0 {
 		reply += "ID	Status		Attempts Left	Hint \n"
 		for _, v := range r.Gallow {
 			status := "          "

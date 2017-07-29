@@ -87,7 +87,7 @@ func main() {
 		case menu == "2":
 			r, err := listGallows(clt)
 			if err != nil {
-				log.Println(err)
+				fmt.Println(err)
 				break menu
 			}
 			fmt.Println(r)

@@ -29,16 +29,16 @@ func guessLetter(client api.HangmanClient, g *api.Gallow, l string) (string, err
 		}
 
 		if strings.Index(gg.WordMasked, "_") == -1 {
-			return "", fmt.Errorf("\n>>>> Well done, you guessed the word:%v  <<<<\n\n\n", g.WordMasked)
+			return "", fmt.Errorf("\n>>>> Well done, you guessed the word:%v  <<<<\n\n\n", gg.WordMasked)
 		}
 
 		reply += gallowArt[(len(gallowArt) - int(gg.RetryLeft) - 1)]
-		reply += fmt.Sprintf("\nRemaining attempts: %v \n", gg.RetryLeft)
+		reply += fmt.Sprintf("\nRemaining attempts: %v", gg.RetryLeft)
 		reply += ("\nIncorrect attempts: ")
 		for _, v := range gg.IncorrectGuesses {
 			reply += fmt.Sprint(v.Letter, " ")
 		}
-		reply += fmt.Sprint("\nWord hint:", g.WordMasked)
+		reply += fmt.Sprint("\nWord hint:", gg.WordMasked)
 	} else {
 		return "", errors.New("Invalid Game ID")
 	}
