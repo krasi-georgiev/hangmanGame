@@ -71,7 +71,9 @@ func (s *hangman) SaveGallow(ctx context.Context, r *api.GallowRequest) (*api.Ga
 	// stay in range of the slice
 	if r.Id > 0 && int32(len(s.slaughter)) > r.Id {
 		s.slaughter[r.Id].Status = false
-		return s.slaughter[r.Id], nil
+		gg := *s.slaughter[r.Id] // need to dereference so we don't change the original struct
+		gg.Word = ""             // don't sent the naked word to the client , to avoid cheating clients :)
+		return &gg, nil
 	}
 	return nil, errors.New("Invalid Game ID")
 }
