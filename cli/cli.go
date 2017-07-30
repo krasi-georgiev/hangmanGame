@@ -139,3 +139,8 @@ func main() {
 		}
 	}
 }
+
+func usage(w *readline.Instance) {
+	w.SetPrompt("»")
+	io.WriteString(w.Stdout(), completer.Tree("    "))
+}
