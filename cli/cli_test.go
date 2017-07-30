@@ -28,7 +28,7 @@ func TestMain(m *testing.M) {
 		path = "./srv"
 	}
 	cmd = exec.Command(path)
-	if err := cmd.Start(); err != nil {
+	if err = cmd.Start(); err != nil {
 		cmd.Wait()
 		fmt.Fprintf(os.Stderr, "%s", err)
 		os.Exit(1)

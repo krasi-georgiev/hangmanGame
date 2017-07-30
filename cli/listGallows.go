@@ -28,7 +28,7 @@ func listGallows(client api.HangmanClient) (string, error) {
 			reply += fmt.Sprint(v.Id, "	", status, "	", v.RetryLeft, "		", v.WordMasked, "\n")
 		}
 	} else {
-		return "", errors.New("No saved games on the server!")
+		return "", errors.New("No saved games on the server")
 	}
 	return reply, nil
 }
