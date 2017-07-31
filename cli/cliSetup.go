@@ -31,9 +31,5 @@ func getGRPCConnection() (api.HangmanClient, error) {
 }
 
 func appContext() (context.Context, context.CancelFunc) {
-	var (
-		ctx     = context.Background()
-		timeout = 2 * time.Second
-	)
-	return context.WithTimeout(ctx, timeout)
+	return context.WithTimeout(context.Background(), 2*time.Second)
 }

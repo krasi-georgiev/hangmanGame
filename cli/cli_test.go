@@ -33,7 +33,6 @@ func TestMain(m *testing.M) {
 		fmt.Fprintf(os.Stderr, "%s", err)
 		os.Exit(1)
 	}
-	fmt.Printf("Started hangman server with PID: %v \n", cmd.Process.Pid)
 
 	clt, err = getGRPCConnection()
 	if err != nil {
@@ -47,12 +46,8 @@ func TestMain(m *testing.M) {
 		if err == nil {
 			if err := cmd.Process.Kill(); err != nil {
 				fmt.Printf("Can't kill the hangman server, error:%v \n", err)
-			} else {
-				fmt.Printf("Killed hangman server with PID: %v \n", cmd.Process.Pid)
 			}
 		}
-		// cmd.Wait()
-
 	}
 	if err := os.Remove(path); err != nil {
 		fmt.Println(err)
@@ -99,10 +94,42 @@ func TestResumeGallow(t *testing.T) {
 	}
 }
 
-func TestGuesslLetter(t *testing.T) {
+func TestGuessLetter(t *testing.T) {
+	if err := saveGallow(clt, gallow); err != nil {
+		t.Logf("Gallow save error:%v", err)
+		t.Fail()
+	}
+	if _, err := guessLetter(clt, gallow, "~"); err != nil {
+		t.Logf("Guess letter error:%v", err)
+		t.Fail()
+	}
+	// now lets get the gallow again to compare if retry limit has decreased
+	g, err := resumeGallow(clt, strconv.Itoa(int(gallow.Id)))
+	if err != nil {
+		t.Logf("Gallow resume error:%v", err)
+		t.Fail()
+	}
+	if gallow.RetryLeft-g.RetryLeft != 1 {
+		t.Logf("Retry Limit decrease expected:1 actual:%v", (g.RetryLeft - gallow.RetryLeft))
+		t.Fail()
+	}
 
 }
 
 func TestGamePlay(t *testing.T) {
+	if err := saveGallow(clt, gallow); err != nil {
+		t.Logf("Gallow save error:%v", err)
+		t.FailNow()
+	}
+
+	var err error
+	for x := gallow.RetryLeft + 1; x > 1; x-- {
+		_, err = guessLetter(clt, gallow, strconv.Itoa(int(x)))
+	}
+
+	if err == nil {
+		t.Log("Game didn't end after so many incorrect answers")
+		t.Fail()
+	}
 
 }
