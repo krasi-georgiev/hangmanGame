@@ -6,8 +6,3 @@
 * Resuming a saved game
 * Listing Saved games
 * Concurrent players
-
-TODO:
-```
-	unit/integration tests
-```
